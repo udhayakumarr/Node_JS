@@ -1,6 +1,18 @@
 const fs = require("fs/promises");
 
 (async () => {
+  async function createFile(path) {
+    try {
+      const existingFileHandler = await fs.open(path, "r");
+      console.log("File is already exist");
+      existingFileHandler.close();
+    } catch {
+      const newFileHandler = await fs.open(path, "w");
+      console.log("New file is created");
+      newFileHandler.close();
+    }
+  }
+
   const commandFileHandler = await fs.open("./command.txt", "r");
 
   commandFileHandler.on("change", async () => {
@@ -20,13 +32,16 @@ const fs = require("fs/promises");
     const position = 0;
 
     // we always the read the content from start to end
-     await commandFileHandler.read(buffer, offset, length, position);
+    await commandFileHandler.read(buffer, offset, length, position);
 
     // console.log(buffer)
 
-    const content = buffer.toString("utf-8");
+    const command = buffer.toString("utf-8");
 
-    console.log("content", content);
+    if (command.includes("create a file")) {
+      const filePath = command.substring("create a file".length + 1);
+      createFile(filePath);
+    }
   });
   const watcher = fs.watch("./command.txt");
   for await (const event of watcher) {
