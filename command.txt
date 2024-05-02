@@ -1,1 +1,1 @@
-create a file newFile.txt
+rename the file test.txt to newFile.txt

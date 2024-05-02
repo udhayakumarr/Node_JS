@@ -13,6 +13,28 @@ const fs = require("fs/promises");
     }
   }
 
+  async function deleteFile(path) {
+    try {
+      await fs.unlink(path);
+      console.log("File is deleted");
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        console.log("File is not exist");
+      } else {
+        console.log("A error occurred while removing the file", e);
+      }
+    }
+  }
+
+  async function renameFile(oldPath, newPath) {
+    try {
+      await fs.rename(oldPath, newPath)
+      console.log("Rename is done")
+    } catch {
+      console.log("A error occurred while renaming the file")
+    }
+  } 
+
   const commandFileHandler = await fs.open("./command.txt", "r");
 
   commandFileHandler.on("change", async () => {
@@ -38,9 +60,24 @@ const fs = require("fs/promises");
 
     const command = buffer.toString("utf-8");
 
+    // create a file <apth>
     if (command.includes("create a file")) {
       const filePath = command.substring("create a file".length + 1);
       createFile(filePath);
+    }
+
+    // delete the file <path>
+    if (command.includes("delete the file")) {
+      const filePath = command.substring("delete the file".length + 1);
+      deleteFile(filePath);
+    }
+
+    // rename the file <path> to <path>
+    if (command.includes("rename the file")) {
+      const _idx = command.indexOf(" to ");
+      const oldPath = command.substring("rename the file".length + 1, _idx);
+      const newPath = command.substring(_idx + 4);
+      renameFile(oldPath, newPath)
     }
   });
   const watcher = fs.watch("./command.txt");
