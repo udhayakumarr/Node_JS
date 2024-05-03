@@ -28,12 +28,23 @@ const fs = require("fs/promises");
 
   async function renameFile(oldPath, newPath) {
     try {
-      await fs.rename(oldPath, newPath)
-      console.log("Rename is done")
+      await fs.rename(oldPath, newPath);
+      console.log("Rename is done");
     } catch {
-      console.log("A error occurred while renaming the file")
+      console.log("A error occurred while renaming the file");
     }
-  } 
+  }
+
+  async function addToFile(path, content) {
+    try {
+      const fileHandler = await fs.open(path, "a");
+      await fileHandler.appendFile(content);
+
+      console.log("content updated");
+    } catch {
+      console.log("A error occurred while adding content to the file");
+    }
+  }
 
   const commandFileHandler = await fs.open("./command.txt", "r");
 
@@ -77,7 +88,15 @@ const fs = require("fs/promises");
       const _idx = command.indexOf(" to ");
       const oldPath = command.substring("rename the file".length + 1, _idx);
       const newPath = command.substring(_idx + 4);
-      renameFile(oldPath, newPath)
+      renameFile(oldPath, newPath);
+    }
+
+    // add to the file <path> this content: <cotent>
+    if (command.includes("add to the file")) {
+      const _idx = command.indexOf(" this content: ");
+      const path = command.substring("add to the file".length + 1, _idx);
+      const content = command.substring(_idx + 15);
+      addToFile(path, content);
     }
   });
   const watcher = fs.watch("./command.txt");

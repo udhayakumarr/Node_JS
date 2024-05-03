@@ -1,1 +1,1 @@
-rename the file test.txt to newFile.txt
+add to the file newFile.txt this content: testing
